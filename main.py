@@ -32,7 +32,7 @@ CAR_IMAGES_AND_SPEEDS = {
 
 FONT = pygame.font.SysFont('Arial', 40)
 
-FPS = 120
+FPS = 80
 # Ширина экрана зависит от кол-ва полос и их ширины, поэтому этот параметр берется из режима игры
 SCREEN_WIDTH = GAME_MODE.screen_width
 SCREEN_HEIGHT = 700
@@ -253,8 +253,8 @@ def run_race():
         # Создание полицейской машины
         police_car = PoliceCar([all_sprites_group, all_cars_group, bot_cars_group],
                                image_file_name=POLICE_CAR_IMAGE_FILE_NAME,
-                               max_speed=USER_MAX_SPEED,
-                               max_acceleration=USER_MAX_ACCELERATION * 0.9,
+                               max_speed=USER_MAX_SPEED * 0.94,
+                               max_acceleration=USER_MAX_ACCELERATION * 0.8,
                                max_deceleration=BOT_MAX_DECELERATION, player_speed=users_cars[0].speed,
                                x=users_cars[0].rect.x, y_range=(0, SCREEN_HEIGHT),
                                bot_cars_group=bot_cars_group,
@@ -311,6 +311,7 @@ def run_race():
                 # отслеживание нажатия для каждой пользовательской машины
                 for car_number in range(len(users_cars)):
                     if QUANTITY_OF_USERS == 1:
+                        print(event.key)
                         if event.key == KEYS_FOR_DRIVING[car_number]["up"]:
                             users_cars[car_number].gas_pressed()
                         if event.key == KEYS_FOR_DRIVING[car_number]["down"]:
