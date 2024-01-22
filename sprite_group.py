@@ -3,6 +3,9 @@ from cars import UserCar
 
 
 class SpriteGroup(pygame.sprite.Group):
+    """
+    Класс группы спрайтов
+    """
     def __init__(self):
         super().__init__()
         self.game_is_over = False

@@ -1,11 +1,13 @@
 import random
 import sys
+
 import pygame
 
 from button_group import ButtonGroup, ChooseCarButtonGroup
 from cars import BotCar, UserCar, PoliceCar
 from road_marking import RoadMarking
 from road_modes import FourLinesBackForLinesForwardMode, EightLinesForwardMode
+from sidewalk_object import SidewalkObject
 from sprite_group import SpriteGroup
 
 # Инициализация режима игры, по умолчанию - четыре полосы в каждую сторону
@@ -34,7 +36,7 @@ FPS = 120
 # Ширина экрана зависит от кол-ва полос и их ширины, поэтому этот параметр берется из режима игры
 SCREEN_WIDTH = GAME_MODE.screen_width
 SCREEN_HEIGHT = 700
-CARS_COUNT = 5
+CARS_COUNT = 3
 
 # Характеристики машины пользователя по умолчанию, меняются при выборе другой машины
 USER_CAR_IMAGE_FILE_NAME = "car1.png"
@@ -54,10 +56,11 @@ BOT_MAX_TURNING_SPEED = 3
 POLICE_CAR_IMAGE_FILE_NAME = "police_car.png"
 POLICE_CAR_MAX_TURNING_SPEED = 1
 
-# Характеристики дорожной разметки
+# Характеристики дорожной разметки и объектов по бокам от дороги
 ROAD_MARKING_WIDTH = GAME_MODE.road_marking_width
 ROAD_MARKING_HEIGHT = 50
 SPACE_BETWEEN_ROAD_MARKINGS = 100
+SPACE_BETWEEN_SIDEWALK_OBJECTS = 150
 
 # Кнопки, которые отвечают за управление.
 # Первый словарь - для первого игрока (или одиночного режима), второй - для второго игрока
@@ -160,6 +163,7 @@ def choose_car_window():
                    selected_file_name=USER_CAR_IMAGE_FILE_NAME,
                    is_horizontal=True, function=set_user_car)
 
+
 def game_over():
     # меню после окончания игры
     menu_with_buttons({"Начать заново": lambda: run_race(), "Главное меню": start_menu_window})
@@ -172,6 +176,7 @@ def run_race():
     bot_cars_group = SpriteGroup()
     all_cars_group = SpriteGroup()
     road_markings_group = SpriteGroup()
+    sidewalk_objects_group = SpriteGroup()
 
     # Полицейская машина создается непосредственно перед погоней, в остальное время police_car - None
     police_car = None
@@ -196,6 +201,7 @@ def run_race():
             car.set_acceleration(0.005)
 
     distance_left_to_the_next_road_marking = 0
+    distance_left_to_the_next_sidewalk_object = 0
     # Параметры для сдвига машины пользователя во время погони
     user_car_goal_pos = None
     user_car_moving_across_the_screen_speed = 0
@@ -205,7 +211,7 @@ def run_race():
     available_x_coords_for_car_creating_forward_top = list()
 
     def get_user_car_speed_in_kilometres_per_hour():
-        # преобразование скорости пользователя в километры в час.
+        # Преобразование скорости пользователя в километры в час.
         # Нужно для отслеживания лимита скорости и отображения текущец скорости
         return int(users_cars[0].speed * 10)
 
@@ -225,6 +231,7 @@ def run_race():
         # Отрисовка
         road_markings_group.draw(screen)
         all_cars_group.draw(screen)
+        sidewalk_objects_group.draw(screen)
 
     def move_user_down_when_police_chase_is_over():
         # Сдвиг машины пользователя вниз после окончания погони
@@ -247,9 +254,9 @@ def run_race():
         police_car = PoliceCar([all_sprites_group, all_cars_group, bot_cars_group],
                                image_file_name=POLICE_CAR_IMAGE_FILE_NAME,
                                max_speed=USER_MAX_SPEED * 0.94,
-                               max_acceleration=users_cars[0].calculate_acceleration() * 0.8,
+                               max_acceleration=users_cars[0].calculate_acceleration() * 0.75,
                                max_deceleration=BOT_MAX_DECELERATION, player_speed=users_cars[0].speed,
-                               x=GAME_MODE.get_player_x_coord(), y_range=(0, SCREEN_HEIGHT),
+                               x=users_cars[0].rect.x, y_range=(0, SCREEN_HEIGHT),
                                bot_cars_group=bot_cars_group,
                                max_turning_speed=POLICE_CAR_MAX_TURNING_SPEED,
                                user_car=users_cars[0], all_cars_group=all_cars_group,
@@ -263,6 +270,7 @@ def run_race():
     def update_available_x_coords_for_placing_cars():
         nonlocal available_x_coords_for_car_creating_forward_top
         nonlocal available_x_coords_for_car_creating_back_top
+
         # Обновление координат для создания ботов
 
         def check_if_car_is_on_traffic_lane(car, traffic_lane_start_x, traffic_lane_width):
@@ -276,6 +284,7 @@ def run_race():
             if car.rect.top <= car.rect.height:
                 return True
             return False
+
         # Запись координат, доступных для расположения машин на полосе пользователя
         available_x_coords_for_car_creating_forward_top = \
             [x for x in GAME_MODE.forward_cars_coords_x
@@ -316,7 +325,6 @@ def run_race():
                         if event.key == KEYS_FOR_DRIVING[car_number]["up"] \
                                 or event.key == KEYS_FOR_DRIVING[car_number]["down"]:
                             users_cars[car_number].gas_released()
-
                     if event.key == KEYS_FOR_DRIVING[car_number]["left"] \
                             or event.key == KEYS_FOR_DRIVING[car_number]["right"]:
                         users_cars[car_number].turning_speed = 0
@@ -345,7 +353,7 @@ def run_race():
 
                 new_bot_car.move(y=-new_bot_car.rect.height)
                 if random_list is available_x_coords_for_car_creating_forward_top:
-                    # при расположении машины на полосе пользователя сверху,
+                    # при расположении машины на полосе пользователя сверху
                     # скорость созданной машины должна быть меньше, чем у пользователя
                     new_bot_car.set_speed(random.randrange(max(BOT_MAX_SPEED // 2, 1),
                                                            max(BOT_MAX_SPEED // 2,
@@ -365,6 +373,16 @@ def run_race():
                                                -ROAD_MARKING_HEIGHT, [0, SCREEN_HEIGHT],
                                                player_speed=users_cars[0].speed)
 
+        # создание недостающих объектов по бокам от дороги
+        distance_left_to_the_next_sidewalk_object -= users_cars[0].speed
+        if distance_left_to_the_next_sidewalk_object <= 0:
+            distance_left_to_the_next_sidewalk_object = SPACE_BETWEEN_SIDEWALK_OBJECTS
+            for i in range(2):
+                new_sidewalk_object = SidewalkObject([sidewalk_objects_group, all_sprites_group],
+                                                     50 if i == 0 else SCREEN_WIDTH,
+                                                     -SPACE_BETWEEN_SIDEWALK_OBJECTS,
+                                                     [0, SCREEN_HEIGHT], users_cars[0].speed)
+
         # превышение скорости отслеживается только когда игрок один, при игре вдвоем полицейская погоня невозможна
         if QUANTITY_OF_USERS == 1:
             if get_user_car_speed_in_kilometres_per_hour() > SPEED_LIMIT * 1.1 and not police_car:
@@ -382,6 +400,9 @@ def run_race():
 
         # отрисовка и обновление
         screen.fill(pygame.Color("grey"))
+        pygame.draw.rect(screen, pygame.Color((0, 120, 0)), (0, 0, min(GAME_MODE.range_x), SCREEN_HEIGHT), 0)
+        pygame.draw.rect(screen, pygame.Color((0, 120, 0)), (max(GAME_MODE.range_x), 0,
+                                                             SCREEN_WIDTH - max(GAME_MODE.range_x), SCREEN_HEIGHT), 0)
         update_all_groups()
         draw_all_sprites()
         show_speed()

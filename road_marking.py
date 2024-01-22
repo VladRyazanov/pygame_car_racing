@@ -3,6 +3,9 @@ import pygame
 
 
 class RoadMarking(Object):
+    """
+    Класс дорожной разметки
+    """
     def __init__(self, group, width, height, x, y, y_range, player_speed):
         self.image = pygame.Surface([width, height])
         self.image.fill(pygame.Color("white"))

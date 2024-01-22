@@ -4,6 +4,9 @@ from load_image import load_image
 
 
 class Object(pygame.sprite.Sprite):
+    """
+    Класс всех объектов на экране. От него унаследованы такие классы, как Car, RoadMarking и т.д
+    """
     def __init__(self, group, x, y, image_file_name, x_range, y_range, player_speed, is_moving_back=False):
         super().__init__(group)
         self.is_moving_back = is_moving_back
@@ -15,9 +18,13 @@ class Object(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+        # x_range и y_range - это диапазоны координат, в которых может находиться объект. Например,
+        # машины не могут заезжать за края дороги
         self.x_range = x_range[0], x_range[1] - self.image.get_width()
         self.y_range = y_range[0] - self.image.get_height() * 2, y_range[1] + self.image.get_height()
 
+        # свйство player_speed сделано для того, чтобы перемещать данный объект относительно экрана,
+        # создавая эффект движения пользователя
         self.player_speed = player_speed
         self.speed = 0
         self.acceleration = 0
