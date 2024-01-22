@@ -190,7 +190,7 @@ class PoliceCar(BotCar):
         super().__init__(args, **kwargs)
         self.user_car = user_car
         self.is_following_user = False
-        self.acceleration = self.max_acceleration
+        self.acceleration = self.calculate_acceleration()
         self.speed = 0
         # Смена значения self.traffic_lanes_coords происходит для того,
         # чтобы полицейская машина могла ехать по встречной полосе
@@ -223,3 +223,4 @@ class PoliceCar(BotCar):
             if pygame.sprite.collide_mask(self, self.user_car):
                 for i in self.groups():
                     i.game_over()
+            self.acceleration = self.calculate_acceleration()

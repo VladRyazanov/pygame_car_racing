@@ -5,7 +5,7 @@ from load_image import load_image
 
 class Object(pygame.sprite.Sprite):
     """
-    Класс всех объектов на экране. От него унаследованы такие классы, как Car, RoadMarking и т.д
+    Класс всех объектов на экране. От него наследуются такие классы, как Car, RoadMarking и т.д
     """
     def __init__(self, group, x, y, image_file_name, x_range, y_range, player_speed, is_moving_back=False):
         super().__init__(group)
