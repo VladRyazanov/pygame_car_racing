@@ -62,10 +62,6 @@ ROAD_MARKING_HEIGHT = 50
 SPACE_BETWEEN_ROAD_MARKINGS = 100
 SPACE_BETWEEN_SIDEWALK_OBJECTS = 300
 
-# Кнопки, которые отвечают за управление.
-# Первый словарь - для первого игрока (или одиночного режима), второй - для второго игрока
-KEYS_FOR_DRIVING = [{"up": pygame.K_w, "down": pygame.K_s, "left": pygame.K_a, "right": pygame.K_d},
-                    {"up": pygame.K_UP, "down": pygame.K_DOWN, "left": pygame.K_LEFT, "right": pygame.K_RIGHT}]
 
 # Прочие характеристики
 TIME_FOR_BOTS_TO_CHANGE_TRAFFIC_LANE = 2
@@ -253,8 +249,8 @@ def run_race():
         # Создание полицейской машины
         police_car = PoliceCar([all_sprites_group, all_cars_group, bot_cars_group],
                                image_file_name=POLICE_CAR_IMAGE_FILE_NAME,
-                               max_speed=USER_MAX_SPEED * 0.94,
-                               max_acceleration=USER_MAX_ACCELERATION * 0.8,
+                               max_speed=USER_MAX_SPEED * 0.95,
+                               max_acceleration=USER_MAX_ACCELERATION,
                                max_deceleration=BOT_MAX_DECELERATION, player_speed=users_cars[0].speed,
                                x=users_cars[0].rect.x, y_range=(0, SCREEN_HEIGHT),
                                bot_cars_group=bot_cars_group,
@@ -308,26 +304,30 @@ def run_race():
             if event.type == pygame.QUIT:
                 terminate()
             if event.type == pygame.KEYDOWN:
+                # Кнопки, которые отвечают за управление.
+                # Первый словарь - для первого игрока (или одиночного режима), второй - для второго игрока
+                keys_for_driving = [{"up": pygame.K_w, "down": pygame.K_s, "left": pygame.K_a, "right": pygame.K_d},
+                                    {"up": pygame.K_UP, "down": pygame.K_DOWN, "left": pygame.K_LEFT,
+                                     "right": pygame.K_RIGHT}]
                 # отслеживание нажатия для каждой пользовательской машины
                 for car_number in range(len(users_cars)):
                     if QUANTITY_OF_USERS == 1:
-                        print(event.key)
-                        if event.key == KEYS_FOR_DRIVING[car_number]["up"]:
+                        if event.key == keys_for_driving[car_number]["up"]:
                             users_cars[car_number].gas_pressed()
-                        if event.key == KEYS_FOR_DRIVING[car_number]["down"]:
+                        if event.key == keys_for_driving[car_number]["down"]:
                             users_cars[car_number].brake_pressed()
-                    if event.key == KEYS_FOR_DRIVING[car_number]["left"]:
+                    if event.key == keys_for_driving[car_number]["left"]:
                         users_cars[car_number].turn_left()
-                    if event.key == KEYS_FOR_DRIVING[car_number]["right"]:
+                    if event.key == keys_for_driving[car_number]["right"]:
                         users_cars[car_number].turn_right()
             if event.type == pygame.KEYUP:
                 for car_number in range(len(users_cars)):
                     if QUANTITY_OF_USERS == 1:
-                        if event.key == KEYS_FOR_DRIVING[car_number]["up"] \
-                                or event.key == KEYS_FOR_DRIVING[car_number]["down"]:
+                        if event.key == keys_for_driving[car_number]["up"] \
+                                or event.key == keys_for_driving[car_number]["down"]:
                             users_cars[car_number].gas_released()
-                    if event.key == KEYS_FOR_DRIVING[car_number]["left"] \
-                            or event.key == KEYS_FOR_DRIVING[car_number]["right"]:
+                    if event.key == keys_for_driving[car_number]["left"] \
+                            or event.key == keys_for_driving[car_number]["right"]:
                         users_cars[car_number].turning_speed = 0
 
         # если на экране машин-ботов меньше, чем нужно
