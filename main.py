@@ -309,14 +309,16 @@ def run_race():
                         users_cars[0].gas_pressed()
                     if event.key == pygame.K_s:
                         users_cars[0].brake_pressed()
+                else:
+                    if event.key == pygame.K_RIGHT:
+                        users_cars[1].turn_right()
+                    if event.key == pygame.K_LEFT:
+                        users_cars[1].turn_left()
                 if event.key == pygame.K_d:
                     users_cars[0].turn_right()
                 if event.key == pygame.K_a:
                     users_cars[0].turn_left()
-                if event.key == pygame.K_RIGHT:
-                    users_cars[1].turn_right()
-                if event.key == pygame.K_LEFT:
-                    users_cars[1].turn_left()
+
 
             if event.type == pygame.KEYUP:
                 if QUANTITY_OF_USERS == 1:
