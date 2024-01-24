@@ -316,7 +316,7 @@ def run_race():
                 if event.key == pygame.K_RIGHT:
                     users_cars[1].turn_right()
                 if event.key == pygame.K_LEFT:
-                    users_cars[0].turn_left()
+                    users_cars[1].turn_left()
 
             if event.type == pygame.KEYUP:
                 if QUANTITY_OF_USERS == 1:
