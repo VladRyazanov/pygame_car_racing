@@ -62,7 +62,6 @@ ROAD_MARKING_HEIGHT = 50
 SPACE_BETWEEN_ROAD_MARKINGS = 100
 SPACE_BETWEEN_SIDEWALK_OBJECTS = 300
 
-
 # Прочие характеристики
 TIME_FOR_BOTS_TO_CHANGE_TRAFFIC_LANE = 2
 TIME_FOR_USER_CAR_TO_MOVE_UP_WHEN_POLICE_CHASE_STARTED = 1
@@ -319,15 +318,15 @@ def run_race():
                 if event.key == pygame.K_a:
                     users_cars[0].turn_left()
 
-
             if event.type == pygame.KEYUP:
                 if QUANTITY_OF_USERS == 1:
                     if event.key == pygame.K_w or event.key == pygame.K_s:
                         users_cars[0].gas_released()
+                else:
+                    if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:
+                        users_cars[1].set_turning_speed(0)
                 if event.key == pygame.K_d or event.key == pygame.K_a:
                     users_cars[0].set_turning_speed(0)
-                if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:
-                    users_cars[1].set_turning_speed(0)
 
         # если на экране машин-ботов меньше, чем нужно
         if len(bot_cars_group) < CARS_COUNT:
