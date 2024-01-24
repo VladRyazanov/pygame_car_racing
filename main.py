@@ -304,31 +304,28 @@ def run_race():
             if event.type == pygame.QUIT:
                 terminate()
             if event.type == pygame.KEYDOWN:
-                # Кнопки, которые отвечают за управление.
-                # Первый словарь - для первого игрока (или одиночного режима), второй - для второго игрока
-                keys_for_driving = [{"up": pygame.K_w, "down": pygame.K_s, "left": pygame.K_a, "right": pygame.K_d},
-                                    {"up": pygame.K_UP, "down": pygame.K_DOWN, "left": pygame.K_LEFT,
-                                     "right": pygame.K_RIGHT}]
-                # отслеживание нажатия для каждой пользовательской машины
-                for car_number in range(len(users_cars)):
-                    if QUANTITY_OF_USERS == 1:
-                        if event.key == keys_for_driving[car_number]["up"]:
-                            users_cars[car_number].gas_pressed()
-                        if event.key == keys_for_driving[car_number]["down"]:
-                            users_cars[car_number].brake_pressed()
-                    if event.key == keys_for_driving[car_number]["left"]:
-                        users_cars[car_number].turn_left()
-                    if event.key == keys_for_driving[car_number]["right"]:
-                        users_cars[car_number].turn_right()
+                if QUANTITY_OF_USERS == 1:
+                    if event.key == pygame.K_w:
+                        users_cars[0].gas_pressed()
+                    if event.key == pygame.K_s:
+                        users_cars[0].brake_pressed()
+                if event.key == pygame.K_d:
+                    users_cars[0].turn_right()
+                if event.key == pygame.K_a:
+                    users_cars[0].turn_left()
+                if event.key == pygame.K_RIGHT:
+                    users_cars[1].turn_right()
+                if event.key == pygame.K_LEFT:
+                    users_cars[0].turn_left()
+
             if event.type == pygame.KEYUP:
-                for car_number in range(len(users_cars)):
-                    if QUANTITY_OF_USERS == 1:
-                        if event.key == keys_for_driving[car_number]["up"] \
-                                or event.key == keys_for_driving[car_number]["down"]:
-                            users_cars[car_number].gas_released()
-                    if event.key == keys_for_driving[car_number]["left"] \
-                            or event.key == keys_for_driving[car_number]["right"]:
-                        users_cars[car_number].turning_speed = 0
+                if QUANTITY_OF_USERS == 1:
+                    if event.key == pygame.K_w or event.key == pygame.K_s:
+                        users_cars[0].gas_released()
+                if event.key == pygame.K_d or event.key == pygame.K_a:
+                    users_cars[0].set_turning_speed(0)
+                if event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT:
+                    users_cars[1].set_turning_speed(0)
 
         # если на экране машин-ботов меньше, чем нужно
         if len(bot_cars_group) < CARS_COUNT:
